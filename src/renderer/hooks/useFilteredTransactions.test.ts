@@ -81,4 +81,16 @@ describe('useFilteredTransactions helpers', () => {
       netBalance: 150,
     });
   });
+
+  test('amountMax = 0 matches expenses (signed <= 0)', () => {
+    const filtered = filterTransactions(transactions, {
+      dateFrom: null,
+      dateTo: null,
+      categories: [],
+      amountMin: null,
+      amountMax: 0,
+    });
+
+    expect(filtered).toEqual([transactions[0], transactions[1]]);
+  });
 });

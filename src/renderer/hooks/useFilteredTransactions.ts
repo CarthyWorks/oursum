@@ -48,6 +48,25 @@ export function filterTransactions(
       return false;
     }
 
+    // Special-case: when user sets a single-sided filter to 0 we interpret
+    // that as "signed" zero bound. E.g. amountMax === 0 should match
+    // transactions with amount <= 0 (expenses), and amountMin === 0 should
+    // match transactions with amount >= 0 (income). This preserves the
+    // existing magnitude-based behavior for other ranges.
+    if (filters.amountMin === null && filters.amountMax === 0) {
+      if (transaction.amount > 0) {
+        return false;
+      }
+      return true;
+    }
+
+    if (filters.amountMax === null && filters.amountMin === 0) {
+      if (transaction.amount < 0) {
+        return false;
+      }
+      return true;
+    }
+
     const absoluteAmount = Math.abs(transaction.amount);
 
     if (filters.amountMin !== null && absoluteAmount < filters.amountMin) {
