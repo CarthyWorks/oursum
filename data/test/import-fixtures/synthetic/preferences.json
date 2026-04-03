@@ -1,0 +1,7 @@
+{
+  "language": "en",
+  "numberFormat": "1,234.56",
+  "dateFormat": "mm/dd/yyyy",
+  "currencySymbol": "€",
+  "theme": "mountain"
+}

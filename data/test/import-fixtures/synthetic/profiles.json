@@ -1,0 +1,32 @@
+[
+  {
+    "id": "0b0e165d-9794-40df-a688-14b84d9f27f9",
+    "name": "CC ING Direct",
+    "bankName": "CC ING Direct",
+    "csvDelimiter": "",
+    "columnMap": {
+      "DATA REGISTRAZIONE": "date",
+      "DESCRIZIONE OPERAZIONE": "description",
+      "IMPORTO IN EURO": "amount"
+    },
+    "dateFormat": "mm/dd/yyyy",
+    "amountMultiplier": 1,
+    "headerRowOffset": 6,
+    "fingerprint": "d346744cbb4d2dbc76a0644fa9986216c8e0767672304a078d5fdb549308ff5c"
+  },
+  {
+    "id": "a4df2355-a3ce-40ff-81e2-4eb5d36c2c03",
+    "name": "transazioni",
+    "bankName": "transazioni",
+    "csvDelimiter": "",
+    "columnMap": {
+      "DATA CONTABILE": "date",
+      "DESCRIZIONE OPERAZIONE": "description",
+      "IMPORTO IN EURO": "amount"
+    },
+    "dateFormat": "mm/dd/yyyy",
+    "amountMultiplier": 1,
+    "headerRowOffset": 10,
+    "fingerprint": "a7446c78287ac4106ca012d1af47d0c63cf09c08e8f093e5009dadfe04ad6900"
+  }
+]
