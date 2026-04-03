@@ -1,6 +1,9 @@
 
 name: Update Oursum site on release
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 on:
   release:
     types: [published]
