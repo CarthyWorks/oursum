@@ -485,19 +485,9 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
   ];
 
   return (
-    <div
-      ref={containerRef}
-      className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden"
-      onClick={(e) => {
-        // Click on empty table area (not a checkbox or row) → clear selection
-        const target = e.target as HTMLElement;
-        if (!target.closest('[data-checkbox]') && !target.closest('tr')) {
-          clearSelection();
-        }
-      }}
-    >
+    <div className="flex flex-col flex-1 min-h-0 min-w-0">
       {applyPrompt && !editingTransactionId ? (
-        <div className="border-b border-border bg-muted/30 px-3 py-3">
+        <div className="border-b border-border bg-muted/30 px-3 py-3 shrink-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-foreground">
               {interpolate(t('rules.apply.prompt'), {
@@ -515,6 +505,17 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
           </div>
         </div>
       ) : null}
+    <div
+      ref={containerRef}
+      className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden"
+      onClick={(e) => {
+        // Click on empty table area (not a checkbox or row) → clear selection
+        const target = e.target as HTMLElement;
+        if (!target.closest('[data-checkbox]') && !target.closest('tr')) {
+          clearSelection();
+        }
+      }}
+    >
       <table
         className="w-full text-sm border-collapse"
         style={{ tableLayout: 'fixed' }}
@@ -661,6 +662,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
         isDeleting={isDeleting}
         error={deleteError}
       />
+    </div>
     </div>
   );
 }
