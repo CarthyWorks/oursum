@@ -53,3 +53,4 @@ jobs:
           generate_release_notes: true
           files: |
             artifacts/Oursum-beta-*.dmg
+          token: ${{ secrets.RELEASE_PAT }}
