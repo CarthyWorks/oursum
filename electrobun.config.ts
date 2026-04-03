@@ -1,10 +1,14 @@
 import type { ElectrobunConfig } from "electrobun";
+import { readFileSync } from "fs";
+import { join } from "path";
+
+const pkg = JSON.parse(readFileSync(join(import.meta.dir, "package.json"), "utf8"));
 
 export default {
 	app: {
 		name: "Oursum",
 		identifier: "com.carthyworks.oursum",
-		version: "0.1.0",
+		version: pkg.version,
 		description: "Oursum — personal expense tracker by CarthyWorks",
 	},
 	runtime: {

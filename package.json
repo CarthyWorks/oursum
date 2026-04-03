@@ -8,13 +8,13 @@
 		"dev": "electrobun dev --watch",
 		"dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
 		"hmr": "vite --port 5173",
-		"build": "vite build && electrobun build",
+		"build": "vite build && electrobun build --env=dev",
 		"test": "bun test src/core/",
 		"lint": "bunx eslint src/renderer/ src/shared/ src/core/ --max-warnings 0",
 		"lint:types": "bunx tsc -p tsconfig.renderer.json --noEmit",
 		"test:e2e": "playwright test",
 		"generate-icon": "bun scripts/generate-app-icon.ts",
-		"dmg": "vite build && electrobun build --env=stable"
+		"release": "vite build && electrobun build --env=stable && bun scripts/post-release.ts"
 	},
 	"dependencies": {
 		"@radix-ui/react-alert-dialog": "^1.1.15",
