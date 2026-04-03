@@ -21,16 +21,24 @@ let html = fs.readFileSync(indexPath, 'utf8');
 const tagWithV = tag ? (tag.startsWith('v') ? tag : 'v' + tag) : '';
 const softwareVersion = tagWithV.replace(/^v/, '');
 
-// 1) Update download button href (id="download-btn")
+// 1) Update download button href (id="download-btn") — href may appear before or after id
 if (dmgUrl) {
-  html = html.replace(/(<a[^>]*id="download-btn"[^>]*href=")([^"]*)(")/i, function(_, a, b, c){
-    return a + dmgUrl + c;
-  });
+  // href before id: <a ... href="..." ... id="download-btn" ...>
+  html = html.replace(/(<a[^>]*href=")([^"]*)("[^>]*id="download-btn")/i, (_, a, _old, c) => a + dmgUrl + c);
+  // id before href: <a ... id="download-btn" ... href="..." ...>
+  html = html.replace(/(<a[^>]*id="download-btn"[^>]*href=")([^"]*)(")/i, (_, a, _old, c) => a + dmgUrl + c);
 }
 
 // 2) Update visible meta paragraph with data-t="download.meta"
 if (tagWithV) {
-  html = html.replace(/<p[^>]*data-t="download.meta"[^>]*>[\s\S]*?<\/p>/i, `<p class="download-box__meta" data-t="download.meta">${tagWithV} Public Beta · macOS · Apple Silicon (ARM64) · Free</p>`);
+  html = html.replace(/<p[^>]*data-t="download\.meta"[^>]*>[\s\S]*?<\/p>/i, `<p class="download-box__meta" data-t="download.meta">${tagWithV} Public Beta · macOS · Apple Silicon (ARM64) · Free</p>`);
+}
+
+// 3) Update i18n dictionary entries for "download.meta" in all locales
+// Matches: "download.meta": "v0.x.x ..." across any locale block
+// Keeps each locale's own text prefix but replaces only the version token at the start
+if (tagWithV) {
+  html = html.replace(/("download\.meta"\s*:\s*")v[\d.]+([^"]*")/g, (_, prefix, suffix) => `${prefix}${tagWithV}${suffix}`);
 }
 
 // 3) Update JSON-LD SoftwareApplication node
