@@ -1,14 +1,15 @@
 // src/renderer/components/app/SplitCalculatorPanel.tsx
 // RULE: ADR-005 — lives in src/renderer/, zero imports from src/core/ or src/main/.
 // RULE: Token-based Tailwind classes only — no raw hex/HSL.
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { useI18n } from '../../hooks/useI18n';
 import { useFormatAmount } from '../../hooks/useFormatAmount';
 import { useSplitCalculator, makeDefaultContributors, type SplitType, type Contributor } from '../../hooks/useSplitCalculator';
-import { interpolate } from '../../lib/format-utils';
+import { interpolate, parseFormattedNumber } from '../../lib/format-utils';
+import { useLocale } from '../../context/locale-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface SplitCalculatorPanelProps {
@@ -35,7 +36,12 @@ export function SplitCalculatorPanel({
 }: SplitCalculatorPanelProps) {
   const t = useI18n();
   const formatAmount = useFormatAmount();
+  const locale = useLocale();
   const total = parseFloat(totalAmount) || 0;
+  const [totalInputFocused, setTotalInputFocused] = useState(false);
+  const [displayTotal, setDisplayTotal] = useState<string>(() =>
+    totalAmount ? formatAmount(parseFloat(totalAmount) || 0) : ''
+  );
   const resolvedInitialContributors = useMemo(
     () => initialContributors ?? makeDefaultContributors(),
     [initialContributors]
@@ -49,6 +55,9 @@ export function SplitCalculatorPanel({
   const prevLengthRef = useRef(contributors.length);
 
   useEffect(() => {
+    if (!totalInputFocused) {
+      setDisplayTotal(formatAmount(total));
+    }
     if (contributors.length > prevLengthRef.current) {
       const lastContributor = contributors[contributors.length - 1];
       if (lastContributor) {
@@ -101,11 +110,33 @@ export function SplitCalculatorPanel({
           </label>
           <input
             id="split-total"
-            type="number"
-            min="0"
-            step="0.01"
-            value={totalAmount}
-            onChange={(e) => onTotalAmountChange(e.target.value)}
+            type="text"
+            value={displayTotal}
+            onFocus={() => {
+              setTotalInputFocused(true);
+              // switch to an editable numeric representation
+              setDisplayTotal((prev) => {
+                const parsed = parseFormattedNumber(prev, locale.numberFormat);
+                return parsed !== null ? parsed.toFixed(2) : '';
+              });
+            }}
+            onBlur={() => {
+              setTotalInputFocused(false);
+              const parsed = parseFormattedNumber(displayTotal, locale.numberFormat);
+              const valueToUse = parsed !== null ? parsed : 0;
+              onTotalAmountChange(valueToUse.toFixed(2));
+              setDisplayTotal(formatAmount(valueToUse));
+            }}
+            onChange={(e) => {
+              const v = e.target.value;
+              setDisplayTotal(v);
+              const parsed = parseFormattedNumber(v, locale.numberFormat);
+              if (parsed !== null) {
+                onTotalAmountChange(parsed.toFixed(2));
+              } else {
+                onTotalAmountChange('');
+              }
+            }}
             className="w-full text-2xl font-semibold tabular-nums bg-transparent border-none outline-none text-foreground focus:ring-0"
             aria-label={t('split.panel.totalLabel')}
           />

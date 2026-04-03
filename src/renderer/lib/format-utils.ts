@@ -23,3 +23,21 @@ export function formatNumberValue(value: number, numberFormat: string): string {
   const formattedInteger = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousands);
   return `${formattedInteger}${decimal}${fracPart}`;
 }
+
+/**
+ * Parse a formatted numeric string (using the provided number format template)
+ * and return a Number value or null when parsing fails.
+ */
+export function parseFormattedNumber(formatted: string, numberFormat: string): number | null {
+  if (!formatted) return null;
+  const { thousands, decimal } = parseFormatSeparators(numberFormat);
+  // Strip currency symbols, spaces and any characters except digits, minus and separators
+  const allowed = new RegExp(`[^0-9\\-\\${thousands}\\${decimal}]`, 'g');
+  const cleaned = formatted.replace(allowed, '');
+  if (cleaned === '' || cleaned === '-' || cleaned === `-${decimal}`) return null;
+  // Remove thousands separators then replace decimal separator with '.' before parse
+  const removedThousands = thousands ? cleaned.split(thousands).join('') : cleaned;
+  const normalized = decimal === '.' ? removedThousands : removedThousands.split(decimal).join('.');
+  const parsed = parseFloat(normalized);
+  return Number.isNaN(parsed) ? null : parsed;
+}
