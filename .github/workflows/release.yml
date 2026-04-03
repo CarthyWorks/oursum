@@ -39,11 +39,16 @@ jobs:
           # Create the tag locally if it doesn't exist (e.g. manual dispatch)
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${TAG}" || true
-          git push origin "${TAG}" || true
+          if ! git rev-parse "${TAG}" >/dev/null 2>&1; then
+            git tag "${TAG}"
+            git push origin "refs/tags/${TAG}"
+          else
+            echo "Tag ${TAG} already exists, skipping creation"
+            git push origin "refs/tags/${TAG}" || echo "Tag already on remote"
+          fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
