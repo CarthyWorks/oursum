@@ -4,7 +4,7 @@ export default {
 	app: {
 		name: "Oursum",
 		identifier: "com.carthyworks.oursum",
-		version: "0.0.1",
+		version: "0.1.0",
 		description: "Oursum — personal expense tracker by CarthyWorks",
 	},
 	runtime: {

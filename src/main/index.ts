@@ -39,7 +39,7 @@ function createMainWindow(): BrowserWindow {
 	// bunRPC is passed directly to BrowserWindow — it sets up the typed WebSocket
 	// IPC transport between this Bun process and the renderer's Electroview instance.
 	const window = new BrowserWindow({
-		title: "Oursum",
+		title: "Oursum (Beta)",
 		url,
 		rpc: bunRPC,
 		frame: {
