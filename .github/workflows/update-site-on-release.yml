@@ -1,0 +1,51 @@
+name: Update Oursum site on release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Find .dmg asset URL
+        id: find_dmg
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const assets = github.context.payload.release.assets || [];
+            const dmg = assets.find(a => a.name && a.name.endsWith('.dmg'));
+            core.setOutput('dmg_url', dmg ? dmg.browser_download_url : '');
+
+      - name: Checkout site repository
+        uses: actions/checkout@v4
+        with:
+          repository: CarthyWorks/oursum-site
+          path: site
+          token: ${{ secrets.SITE_REPO_PAT }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Update site files
+        run: |
+          node .github/scripts/update-site.js site "${{ github.event.release.tag_name }}" "${{ steps.find_dmg.outputs.dmg_url }}"
+
+      - name: Commit and push changes
+        run: |
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html || true
+          git commit -m "chore(site): update download link and version for release ${{ github.event.release.tag_name }}" || echo "no changes to commit"
+          git push origin HEAD:main
+        env:
+          GIT_TERMINAL_PROMPT: '0'
