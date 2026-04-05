@@ -19,7 +19,7 @@ development with a tip on [Ko-fi](https://ko-fi.com/oursum).
 
 ## Requirements
 
-- macOS (arm64 or x64)
+- macOS (arm64)
 - [Bun](https://bun.sh) ≥ 1.x
 
 ## Getting Started
