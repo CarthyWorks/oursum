@@ -2,6 +2,8 @@
 
 **Oursum** is a personal expense tracker desktop application built with [Electrobun](https://electrobun.dev/), React, and SQLite. It runs natively on macOS and is designed to be fast, private, and offline-first.
 
+Have a look at the [landing page](https://oursum.app).
+
 Contribute to Oursum by opening issues and submitting pull requests, or support
 development with a tip on [Ko-fi](https://ko-fi.com/oursum).
 
