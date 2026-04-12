@@ -20,9 +20,9 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 ; Run elevated but allow user to downgrade to per-user if they prefer
 PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=artifacts
+OutputDir={#SourcePath}\..\artifacts
 OutputBaseFilename=Oursum-beta-{#MyAppVersion}-win-x64
-SetupIconFile=icon.ico
+SetupIconFile={#SourcePath}\..\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -37,7 +37,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "build\stable-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}\..\build\stable-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
