@@ -67,39 +67,6 @@ jobs:
             artifacts/Oursum-beta-*-macos-arm64.dmg
           token: ${{ secrets.RELEASE_PAT }}
 
-  release-macos-x64:
-    name: Build & Release (macOS x64)
-    needs: prepare
-    runs-on: macos-13
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build & package
-        run: bun release
-        env:
-          ELECTROBUN_DEVELOPER_ID: ${{ secrets.ELECTROBUN_DEVELOPER_ID }}
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2.6.1
-        with:
-          tag_name: ${{ needs.prepare.outputs.tag }}
-          generate_release_notes: false
-          files: |
-            artifacts/Oursum-beta-*-macos-x64.dmg
-          token: ${{ secrets.RELEASE_PAT }}
-
   release-windows:
     name: Build & Release (Windows x64)
     needs: prepare
