@@ -39,7 +39,7 @@ export const ImportProfileSchema = z.object({
   name: z.string(),
   bankName: z.string(),
   csvDelimiter: z.string(),
-  columnMap: z.record(z.string()),
+  columnMap: z.record(z.string(), z.string()),
   dateFormat: z.string(),
   amountMultiplier: z.number(),
   headerRowOffset: z.number().int().nonnegative(), // REQUIRED — parser Story 2.1 depends on this

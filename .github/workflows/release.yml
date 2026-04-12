@@ -10,8 +10,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  release-macos:
+  prepare:
+    name: Resolve & push version tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version tag
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git push origin ":refs/tags/${TAG}" 2>/dev/null || echo "No remote tag ${TAG} to delete"
+          git tag "${TAG}" 2>/dev/null || git tag -f "${TAG}"
+          git push origin "refs/tags/${TAG}"
+
+  release-macos-arm64:
     name: Build & Release (macOS arm64)
+    needs: prepare
     runs-on: macos-14
     permissions:
       contents: write
@@ -33,24 +58,75 @@ jobs:
         env:
           ELECTROBUN_DEVELOPER_ID: ${{ secrets.ELECTROBUN_DEVELOPER_ID }}
 
-      - name: Resolve version tag
-        id: version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v${VERSION}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Delete remote tag if present, then recreate at HEAD
-          git push origin ":refs/tags/${TAG}" 2>/dev/null || echo "No remote tag ${TAG} to delete"
-          git tag "${TAG}" 2>/dev/null || git tag -f "${TAG}"
-          git push origin "refs/tags/${TAG}"
-
-      - name: Create GitHub Release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2.6.1
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          generate_release_notes: false
+          files: |
+            artifacts/Oursum-beta-*-macos-arm64.dmg
+          token: ${{ secrets.RELEASE_PAT }}
+
+  release-macos-x64:
+    name: Build & Release (macOS x64)
+    needs: prepare
+    runs-on: macos-13
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build & package
+        run: bun release
+        env:
+          ELECTROBUN_DEVELOPER_ID: ${{ secrets.ELECTROBUN_DEVELOPER_ID }}
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2.6.1
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          generate_release_notes: false
+          files: |
+            artifacts/Oursum-beta-*-macos-x64.dmg
+          token: ${{ secrets.RELEASE_PAT }}
+
+  release-windows:
+    name: Build & Release (Windows x64)
+    needs: prepare
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build & package
+        run: bun run release:win
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2.6.1
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
           generate_release_notes: true
           files: |
-            artifacts/Oursum-beta-*.dmg
+            artifacts/Oursum-beta-*-win-x64.*
           token: ${{ secrets.RELEASE_PAT }}
